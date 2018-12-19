@@ -3,16 +3,16 @@ namespace :racecar do
   task :start do
     on roles(:all) do
       within release_path do
-        # files = Dir["/Users/fengce/huaxing/quiver/app/consumers/*.rb"]
-        files = Dir["#{release_path}/app/consumers/*.rb"]
-        info files
-        info "[racecar:start] start racecar ..."
-        files.each do |path|
-          file_name = File.basename(path, ".*")
-          class_name = file_name.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
-          info "[racecar:start] start racecar #{class_name} ..."
-          pidfile = "tmp/#{fetch(:racecar_pid_path)}/#{fetch(:racecar_pid_prefix)}_#{file_name}.pid"
-          execute "bundle", "exec racecar", class_name, "--pidfile=#{pidfile} RAILS_ENV=#{fetch(:stage)}"
+        with rails_env: fetch(:stage) do
+          all_consumer_files = capture("ls #{release_path}/app/consumers")
+          files = all_consumer_files.split("\n").find_all{|e| e.end_with?('.rb') }
+          files.each do |path|
+            file_name = File.basename(path, ".*")
+            class_name = file_name.split('_').collect(&:capitalize).join
+            info "[racecar:start] start racecar #{class_name} ..."
+            pidfile = "tmp/#{fetch(:racecar_pid_path)}/#{fetch(:racecar_pid_prefix)}_#{file_name}.pid"
+            execute "bundle", "exec racecar", class_name, "--pidfile=#{pidfile} --daemonize"
+          end
         end
       end
     end

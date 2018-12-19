@@ -3,11 +3,11 @@ namespace :racecar do
   task :stop do
     on roles(:all) do
       within release_path do
-        # pidfiles = Dir["/Users/fengce/huaxing/quiver/tmp/#{fetch(:racecar_pid_path)}/#{fetch(:racecar_pid_prefix)}_*.pid"]
-        pidfiles = Dir["#{current_path}/tmp/#{fetch(:racecar_pid_path)}/#{fetch(:racecar_pid_prefix)}_*.pid"]
+        all_pidfiles = capture(:ls, "#{release_path}/tmp/#{fetch(:racecar_pid_path)}")
+        pidfiles = all_pidfiles.split("\n").find_all{|e| e.start_with?("#{fetch(:racecar_pid_prefix)}") && e.end_with?('pid') }
         info "[racecar:stop] stop all racecar ..."
         pidfiles.each do |pidfile|
-          execute "bundle", "exec", "racecarctl stop --pidfile=#{pidfile}"
+          execute "bundle", "exec", "racecarctl stop --pidfile=tmp/#{fetch(:racecar_pid_path)}/#{pidfile}", raise_on_non_zero_exit: false
         end
       end
     end
