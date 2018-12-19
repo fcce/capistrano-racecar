@@ -1,0 +1,7 @@
+namespace :racecar do
+  desc 'restart Racecar'
+  task :restart do
+    invoke 'racecar:stop'
+    invoke 'racecar:start'
+  end
+end
