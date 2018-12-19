@@ -5,6 +5,8 @@ namespace :racecar do
       within release_path do
         # files = Dir["/Users/fengce/huaxing/quiver/app/consumers/*.rb"]
         files = Dir["#{release_path}/app/consumers/*.rb"]
+        info files
+        info "[racecar:start] start racecar ..."
         files.each do |path|
           file_name = File.basename(path, ".*")
           class_name = file_name.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
