@@ -4,7 +4,7 @@ namespace :racecar do
     on roles(:all) do
       within release_path do
         with rails_env: fetch(:stage) do
-          all_consumer_files = capture("ls #{release_path}/app/consumers")
+          all_consumer_files = capture("ls #{release_path}/#{fetch(:racecar_consumers_path)}")
           files = all_consumer_files.split("\n").find_all{|e| e.end_with?('.rb') }
           files.each do |path|
             file_name = File.basename(path, ".*")
