@@ -13,7 +13,11 @@ namespace :racecar do
               class_name = file_name.split('_').collect(&:capitalize).join
               info "[racecar:start] start racecar #{class_name} ..."
               pidfile = "tmp/#{fetch(:racecar_pid_path)}/#{fetch(:racecar_pid_prefix)}_#{file_name}.pid"
-              execute "bundle", "exec racecar", class_name, "--pidfile=#{pidfile} --daemonize"
+              logfile = "#{release_path}/log/racecar_#{file_name}.log"
+              unless test("[ -d #{logfile} ]")
+                execute "touch", logfile
+              end
+              execute "bundle", "exec racecar", class_name, "--pidfile=#{pidfile} --daemonize --log #{release_path}/log/racecar_#{file_name}.log"
             end
           else
             warn 'racecar_consumers_path is blank, skip start racecar'
