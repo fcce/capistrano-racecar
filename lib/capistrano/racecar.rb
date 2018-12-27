@@ -25,7 +25,8 @@ module Capistrano
     # Deploy hooks registration
     def register_hooks
       # deploy:published
-      after 'deploy:published', 'racecar:restart'
+      after 'deploy:updated', 'racecar:stop'
+      after 'deploy:published', 'racecar:start'
     end
     SSHKit.config.command_map[:racecar] = 'bundle exec racecar'
   end
