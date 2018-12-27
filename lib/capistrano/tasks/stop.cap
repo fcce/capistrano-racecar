@@ -3,11 +3,16 @@ namespace :racecar do
   task :stop do
     on roles(:all) do
       within release_path do
-        all_pidfiles = capture(:ls, "#{release_path}/tmp/#{fetch(:racecar_pid_path)}")
-        pidfiles = all_pidfiles.split("\n").find_all{|e| e.start_with?("#{fetch(:racecar_pid_prefix)}") && e.end_with?('pid') }
-        info "[racecar:stop] stop all racecar ..."
-        pidfiles.each do |pidfile|
-          execute "bundle", "exec", "racecarctl stop --pidfile=tmp/#{fetch(:racecar_pid_path)}/#{pidfile}", raise_on_non_zero_exit: false
+        has_racecar_consumers_path = test("[ -d #{release_path}/#{fetch(:racecar_consumers_path)} ]")
+        if has_racecar_consumers_path
+          all_pidfiles = capture(:ls, "#{release_path}/tmp/#{fetch(:racecar_pid_path)}")
+          pidfiles = all_pidfiles.split("\n").find_all{|e| e.start_with?("#{fetch(:racecar_pid_prefix)}") && e.end_with?('pid') }
+          info "[racecar:stop] stop all racecar ..."
+          pidfiles.each do |pidfile|
+            execute "bundle", "exec", "racecarctl stop --pidfile=tmp/#{fetch(:racecar_pid_path)}/#{pidfile}", raise_on_non_zero_exit: false
+          end
+        else
+          warn 'racecar_consumers_path is blank, skip stop racecar'
         end
       end
     end
